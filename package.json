@@ -1,0 +1,17 @@
+{
+  "name": "velocity-cli",
+  "version": "0.0.0",
+  "description": "Commnad line runner until we can use `meteor test`",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mike Risse",
+  "license": "MIT",
+  "bin": {
+    "velocity": "./velocity-cli.js"
+  },
+  "dependencies": {
+    "commander": "^2.2.0"
+  }
+}
