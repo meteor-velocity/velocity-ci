@@ -27,7 +27,7 @@ function createSymlinks(){
     if (fs.existsSync(tmpMochaWebTests)){
       return
     } else {
-      fs.linkSync(mochaWebTestDir, tmpMochaWebTests);
+      fs.symlinkSync(mochaWebTestDir, tmpMochaWebTests);
     }
   }
 }
