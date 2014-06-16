@@ -1,6 +1,6 @@
 {
   "name": "velocity-cli",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Commnad line runner until we can use `meteor test`",
   "main": "index.js",
   "scripts": {
