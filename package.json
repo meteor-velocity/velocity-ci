@@ -1,5 +1,5 @@
 {
-  "name": "velocity-cli",
+  "name": "velocity-ci",
   "version": "0.0.1",
   "description": "Commnad line runner until we can use `meteor test`",
   "main": "index.js",
@@ -9,7 +9,7 @@
   "author": "Mike Risse",
   "license": "MIT",
   "bin": {
-    "velocity": "./velocity-cli.js"
+    "velocity": "./velocity-ci.js"
   },
   "dependencies": {
     "commander": "^2.2.0"
