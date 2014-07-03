@@ -12,6 +12,7 @@
     "velocity": "./velocity-ci.js"
   },
   "dependencies": {
-    "commander": "^2.2.0"
+    "commander": "^2.2.0",
+    "phantomjs": "^1.9.7-12"
   }
 }
