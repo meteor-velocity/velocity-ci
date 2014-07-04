@@ -23,14 +23,6 @@ function projectRoot(directory){
 var root = projectRoot();
 process.chdir(root);
 
-if (process.argv.indexOf('--test') != -1){
-  console.log("TODO Subscribe to test reports and exit with the appropriate status code");
-}
-
-var meteorArgs = process.argv.filter(function(element){
-  return element !== "--test";
-});
-
 //`$ velocity --help` translates to [ 'node', '/usr/local/bin/velocity', '--help' ]
 //remove the first two arguments then pass off to meteor
 meteorArgs = meteorArgs.slice(2,meteorArgs.length);
@@ -83,6 +75,9 @@ ddpclient.connect(function(error) {
 
   ddpclient.on('message', function (rawMsg) {
     var msg = JSON.parse(rawMsg);
+    // console.log("MSG", msg);
+
+    //display passing and failing tests
     if (msg.msg == "added" && msg.collection =="velocityTestReports"){
       var testDesc = msg.fields.framework + " : " + msg.fields.ancestors.join(":") + " => " + msg.fields.name;
       if(msg.fields.result == "passed"){
@@ -92,11 +87,35 @@ ddpclient.connect(function(error) {
         console.log(msg.fields.failureStackTrace)
       }
     }
+
+    //exit a few seconds after receiving aggregate results
+    if ((msg.msg == "added" || msg.msg == "changed") && msg.collection == "velocityAggregateReports"){
+      // console.log("MSG", msg);
+      var aggregateReports = ddpclient.collections.velocityAggregateReports;
+      var isFinished = null;
+      var finalResult = null;
+      Object.keys(aggregateReports).forEach(function(reportKey){
+        var report = aggregateReports[reportKey];
+        if (report.name == "aggregateComplete")
+          isFinished = report.result == "completed";
+        if (report.name == "aggregateResult")
+          finalResult = report.result;
+      });
+      if (isFinished){
+        meteor.kill("SIGTERM");
+        setTimeout(function(){
+          if (finalResult == "passed"){
+            console.log("TESTS RAN SUCCESSFULLY :-)")
+            process.exit(0);
+          }
+          if (finalResult == "failed"){
+            console.log("FAILURE :-(");
+            process.exit(1);
+          }
+        }, 2000);
+      }
+    }
   });
-
-  console.log('connected!');
-
-
 });
 
 
