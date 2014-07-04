@@ -1,5 +1,6 @@
 velocity-cli
 ============
+NPM module for running your velocity test suites from the command-line
 
 ## Installation
 `npm install -g velocity-cli`
