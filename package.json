@@ -1,6 +1,6 @@
 {
   "name": "velocity-ci",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Commnad line runner until we can use `meteor test`",
   "main": "index.js",
   "scripts": {

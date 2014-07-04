@@ -25,7 +25,7 @@ process.chdir(root);
 
 //`$ velocity --help` translates to [ 'node', '/usr/local/bin/velocity', '--help' ]
 //remove the first two arguments then pass off to meteor
-meteorArgs = meteorArgs.slice(2,meteorArgs.length);
+var meteorArgs = process.argv.slice(2,process.argv.length);
 var meteor = spawn("meteor", meteorArgs);
 
 meteor.on("close", function(code, signal){
