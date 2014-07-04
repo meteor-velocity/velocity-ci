@@ -2,6 +2,9 @@
 var spawn = require('child_process').spawn;
 var fs = require('fs');
 var path = require('path');
+var childProcess = require('child_process')
+var phantomjs = require('phantomjs')
+
 
 function projectRoot(directory){
   //go up the directory tree until we see a .meteor folder
@@ -17,26 +20,7 @@ function projectRoot(directory){
 }
 
 var root = projectRoot();
-var mochaWebTestDir = path.join(root, "tests", "mocha-web");
-var tmpMochaWebTests = path.join(root, "tmpMochaWebTests");
-
-function createSymlinks(){
-  //does `myProject/tests/mocha-web` exist?
-  if (fs.existsSync(mochaWebTestDir)){
-    console.log("creating symlink to mocha-web tests");
-    if (fs.existsSync(tmpMochaWebTests)){
-      return
-    } else {
-      fs.symlinkSync(mochaWebTestDir, tmpMochaWebTests);
-    }
-  }
-}
-
-function removeSymlinks(){
-  if (fs.existsSync(tmpMochaWebTests)){
-    fs.unlinkSync(tmpMochaWebTests);
-  }
-}
+process.chdir(root);
 
 if (process.argv.indexOf('--test') != -1){
   console.log("TODO Subscribe to test reports and exit with the appropriate status code");
@@ -45,8 +29,6 @@ if (process.argv.indexOf('--test') != -1){
 var meteorArgs = process.argv.filter(function(element){
   return element !== "--test";
 });
-
-createSymlinks();
 
 //`$ velocity --help` translates to [ 'node', '/usr/local/bin/velocity', '--help' ]
 //remove the first two arguments then pass off to meteor
@@ -66,17 +48,28 @@ meteor.stderr.on('data', function (data) {
   process.stderr.write(data);
 });
 
-process.on('uncaughtException', function(err) {
-  removeSymlinks();
-  throw err;
-});
+//start DDP connection to Meteor server
+//once mirror is ready, visit it
 
-process.on('SIGINT', function(){
-  removeSymlinks();
-  process.exit(1);
-});
+setTimeout(function(){
+  console.log("Visiting MIRROR");
+  visitMirror('http://localhost:5000');
+}, 10000);
 
-process.on('SIGTERM', function(){
-  removeSymlinks();
-  process.exit(1);
-});
+function visitMirror(mirrorUrl){
+  var binPath = phantomjs.path
+
+  var childArgs = [
+    path.join(__dirname, 'phantom-script.js'), mirrorUrl
+  ];
+
+  childProcess.execFile(binPath, childArgs, function(err, stdout, stderr) {
+    if (err){
+      console.error("PHANTOM ENCOUNTERED ERROR LOADING", mirrorUrl, err);
+    }
+    console.log(stdout);
+    if (stderr){
+      console.error("PHANTOM STDERR:", stderr);
+    }
+  });
+}
