@@ -3,7 +3,7 @@ velocity-cli
 NPM module for running your velocity test suites from the command-line
 
 ## Installation
-`npm install -g velocity-cli`
+`npm install -g velocity-ci`
 
 ## Run
 From inside your project directory type `velocity`
