@@ -4,6 +4,7 @@ var fs = require('fs');
 var path = require('path');
 var childProcess = require('child_process')
 var phantomjs = require('phantomjs')
+var DDPClient = require("ddp");
 
 
 function projectRoot(directory){
@@ -48,11 +49,58 @@ meteor.stderr.on('data', function (data) {
   process.stderr.write(data);
 });
 
-//start DDP connection to Meteor server
-//once mirror is ready, visit it
+var ddpclient = new DDPClient({
+  host: "localhost",
+  port: 3000,
+  /* optional: */
+  auto_reconnect: true,
+  auto_reconnect_timer: 500,
+  use_ssl: false,
+  maintain_collections: true // Set to false to maintain your own collections.
+});
+
+ddpclient.connect(function(error) {
+  // If auto_reconnect is true, this callback will be invoked each time
+  // a server connection is re-established
+  if (error) {
+    console.log('DDP connection error!');
+    return;
+  }
+
+  ddpclient.subscribe(
+    'VelocityTestReports',
+    [],                       // any parameters used by the Publish function
+    function () {             // callback when the subscription is complete
+    }
+  );
+
+  ddpclient.subscribe(
+    'VelocityAggregateReports',
+    [],
+    function () {
+    }
+  );
+
+  ddpclient.on('message', function (rawMsg) {
+    var msg = JSON.parse(rawMsg);
+    if (msg.msg == "added" && msg.collection =="velocityTestReports"){
+      var testDesc = msg.fields.framework + " : " + msg.fields.ancestors.join(":") + " => " + msg.fields.name;
+      if(msg.fields.result == "passed"){
+        console.log("PASSED ", testDesc);
+      } else if (msg.fields.result == "failed"){
+        console.log("FAILED ", testDesc);
+        console.log(msg.fields.failureStackTrace)
+      }
+    }
+  });
+
+  console.log('connected!');
+
+
+});
+
 
 setTimeout(function(){
-  console.log("Visiting MIRROR");
   visitMirror('http://localhost:5000');
 }, 10000);
 

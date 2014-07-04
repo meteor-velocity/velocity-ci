@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "commander": "^2.2.0",
+    "ddp": "^0.7.0",
     "phantomjs": "^1.9.7-12"
   }
 }
