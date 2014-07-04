@@ -1,13 +1,13 @@
 velocity-cli
 ============
 
-# Installation
+## Installation
 `npm install -g velocity-cli`
 
-#Run
-Inside your project type `velocity`
+## Run
+From inside your project directory type `velocity`
 
-#How it works
+##How it works
 1. The velocity-cli spawns a meteor process and connects to it using DDP.
 2. PhantomJS connects to the meteor process to trigger client side tests.
 3. Test results received via DDP are printed at the console.
