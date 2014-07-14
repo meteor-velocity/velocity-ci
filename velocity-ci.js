@@ -5,7 +5,7 @@ var path = require('path');
 var childProcess = require('child_process')
 var phantomjs = require('phantomjs')
 var DDPClient = require("ddp");
-
+var argv = require('minimist')(process.argv.slice(2));
 
 function projectRoot(directory){
   //go up the directory tree until we see a .meteor folder
@@ -43,7 +43,7 @@ meteor.stderr.on('data', function (data) {
 
 var ddpclient = new DDPClient({
   host: "localhost",
-  port: 3000,
+  port: argv.port || 3000,
   /* optional: */
   auto_reconnect: true,
   auto_reconnect_timer: 500,

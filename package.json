@@ -12,8 +12,8 @@
     "velocity": "./velocity-ci.js"
   },
   "dependencies": {
-    "commander": "^2.2.0",
     "ddp": "^0.7.0",
+    "minimist": "^0.2.0",
     "phantomjs": "^1.9.7-12"
   }
 }
