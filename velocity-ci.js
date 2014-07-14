@@ -6,6 +6,7 @@ var childProcess = require('child_process')
 var phantomjs = require('phantomjs')
 var DDPClient = require("ddp");
 var argv = require('minimist')(process.argv.slice(2));
+var psTree = require('ps-tree');
 
 function projectRoot(directory){
   //go up the directory tree until we see a .meteor folder
@@ -102,7 +103,15 @@ ddpclient.connect(function(error) {
           finalResult = report.result;
       });
       if (isFinished){
-        meteor.kill("SIGTERM");
+        psTree(meteor.pid, function(err, children) {
+          var pids = [];
+          for(var i = 0; i < children.length; i++) {
+            var el = children[i];
+            pids.push(el.PID);
+          }
+          childProcess.exec('kill ' + meteor.pid);
+          childProcess.exec('kill ' + pids.join(" "));
+        });
         setTimeout(function(){
           if (finalResult == "passed"){
             console.log("TESTS RAN SUCCESSFULLY :-)")
