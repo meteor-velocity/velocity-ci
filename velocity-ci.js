@@ -74,6 +74,13 @@ ddpclient.connect(function(error) {
     }
   );
 
+  ddpclient.subscribe(
+    'VelocityMirrors',
+    [],
+    function () {
+    }
+  );
+
   ddpclient.on('message', function (rawMsg) {
     var msg = JSON.parse(rawMsg);
     // console.log("MSG", msg);
@@ -87,6 +94,10 @@ ddpclient.connect(function(error) {
         console.log("FAILED ", testDesc);
         console.log(msg.fields.failureStackTrace)
       }
+    }
+
+    if (msg.msg == "added" && msg.collection =="velocityMirrors"){
+      visitMirror(msg.fields.rootUrl);
     }
 
     //exit a few seconds after receiving aggregate results
@@ -126,11 +137,6 @@ ddpclient.connect(function(error) {
     }
   });
 });
-
-
-setTimeout(function(){
-  visitMirror('http://localhost:5000');
-}, 10000);
 
 function visitMirror(mirrorUrl){
   var binPath = phantomjs.path
