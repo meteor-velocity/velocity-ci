@@ -32,6 +32,9 @@ var meteor = spawn("meteor", meteorArgs);
 meteor.on("close", function(code, signal){
   console.log('Meteor process terminated due to receipt of signal '+signal,
     " with code ", code);
+  if (code !== 0){
+    proces.exit(code);
+  }
 });
 
 meteor.stdout.on('data', function (data) {
