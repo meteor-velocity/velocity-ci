@@ -30,9 +30,10 @@ var meteorArgs = process.argv.slice(2,process.argv.length);
 var meteor = spawn("meteor", meteorArgs);
 
 meteor.on("close", function(code, signal){
-  console.log('Meteor process terminated due to receipt of signal '+signal,
-    " with code ", code);
+  // console.log('Meteor process terminated', code, signal);
+  //if meteor exited with a non-zero code
   if (code && code !== 0){
+    conosle.error("meteor process exited with code", code);
     process.exit(code);
   }
 });
@@ -47,7 +48,7 @@ meteor.stderr.on('data', function (data) {
 
 var ddpclient = new DDPClient({
   host: "localhost",
-  port: argv.port || 3000,
+  port: parseInt(argv.port) || parseInt(argv.p) || 3000,
   /* optional: */
   auto_reconnect: true,
   auto_reconnect_timer: 500,
@@ -90,17 +91,19 @@ ddpclient.connect(function(error) {
 
     //display passing and failing tests
     if (msg.msg == "added" && msg.collection =="velocityTestReports"){
-      var testDesc = msg.fields.framework + " : " + msg.fields.ancestors.join(":") + " => " + msg.fields.name;
+      var prefix = "";
+      if (msg.fields.isClient)
+        prefix = "Client";
+      else if (msg.fields.isServer)
+        prefix = "Server";
+      var testDesc = prefix + " : " + msg.fields.ancestors.join(":") + " => " + msg.fields.name;
       if(msg.fields.result == "passed"){
-        console.log("PASSED ", testDesc);
+        // console.log("PASSED ", testDesc);
       } else if (msg.fields.result == "failed"){
+        console.log(msg.fields);
         console.log("FAILED ", testDesc);
         console.log(msg.fields.failureStackTrace)
       }
-    }
-
-    if (msg.msg == "added" && msg.collection =="velocityMirrors"){
-      visitMirror(msg.fields.rootUrl);
     }
 
     //exit a few seconds after receiving aggregate results
@@ -127,11 +130,11 @@ ddpclient.connect(function(error) {
           childProcess.exec('kill ' + pids.join(" "));
         });
         setTimeout(function(){
-          if (finalResult == "passed"){
+          if (finalResult === "passed"){
             console.log("TESTS RAN SUCCESSFULLY :-)")
             process.exit(0);
           }
-          if (finalResult == "failed"){
+          if (finalResult === "failed"){
             console.log("FAILURE :-(");
             process.exit(1);
           }
@@ -142,10 +145,13 @@ ddpclient.connect(function(error) {
 });
 
 function visitMirror(mirrorUrl){
+  console.log("visiting mirror");
   var binPath = phantomjs.path
+  console.log("phantom path", binPath);
 
   var childArgs = [
-    path.join(__dirname, 'phantom-script.js'), mirrorUrl
+    path.join(__dirname, 'phantom-script.js'), "http://localhost:" +
+      (argv.port || argv.p || 3000)
   ];
 
   childProcess.execFile(binPath, childArgs, function(err, stdout, stderr) {
@@ -158,3 +164,5 @@ function visitMirror(mirrorUrl){
     }
   });
 }
+
+setTimeout(visitMirror, 20*1000);
