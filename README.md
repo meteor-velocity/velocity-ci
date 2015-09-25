@@ -1,7 +1,3 @@
-velocity-cli
-============
-This package is now deprecated. Use the 
+Please use:
 
-`meteor run --test`
-
-command that now exists in the Meteor CLI.
+https://github.com/meteor-velocity/velocity-cli
